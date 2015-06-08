@@ -563,12 +563,15 @@ describe(Support.getTestDialectTeaser('Includes with schemas'), function() {
             User.findAll()
           ]);
         }).spread(function(groups, users) {
-          return users[2].setGroup(groups[1]);
+          return users[2].setGroup(groups[1], {
+            logging: console.log
+          });
         }).then(function() {
           return User.findAll({
             include: [
               {model: Group, required: true}
-            ]
+            ],
+            logging: console.log
           }).then(function(users) {
             expect(users.length).to.equal(1);
             expect(users[0].Group).to.be.ok;

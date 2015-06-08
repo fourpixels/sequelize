@@ -650,7 +650,7 @@ describe(Support.getTestDialectTeaser('Instance'), function() {
 
   describe('complete', function() {
     it('gets triggered if an error occurs', function() {
-      return this.User.findOne({ where: ['asdasdasd'] }).catch(function(err) {
+      return this.User.findOne({ where: 'asdasdasd' }).catch(function(err) {
         expect(err).to.exist;
         expect(err.message).to.exist;
       });
@@ -893,38 +893,6 @@ describe(Support.getTestDialectTeaser('Instance'), function() {
             expect(users[0].username).to.equal(username);
             expect(users[0].touchedAt).to.be.instanceof(Date);
             expect(users[0].touchedAt).to.equalDate(new Date(1984, 8, 23));
-          });
-        });
-      });
-    });
-
-    it('handles an entry with primaryKey of zero', function() {
-      var username = 'user'
-        , newUsername = 'newUser'
-        , User2 = this.sequelize.define('User2',
-          {
-            id: {
-              type: DataTypes.INTEGER.UNSIGNED,
-              autoIncrement: false,
-              primaryKey: true
-            },
-            username: { type: DataTypes.STRING }
-          });
-
-      return User2.sync().then(function () {
-        return User2.create({id: 0, username: username}).then(function (user){
-          expect(user).to.be.ok;
-          expect(user.id).to.equal(0);
-          expect(user.username).to.equal(username);
-          return User2.findById(0).then(function (user) {
-            expect(user).to.be.ok;
-            expect(user.id).to.equal(0);
-            expect(user.username).to.equal(username);
-            return user.updateAttributes({username: newUsername}).then(function (user) {
-              expect(user).to.be.ok;
-              expect(user.id).to.equal(0);
-              expect(user.username).to.equal(newUsername);
-            });
           });
         });
       });
@@ -1674,44 +1642,6 @@ describe(Support.getTestDialectTeaser('Instance'), function() {
                 expect(sql).to.exist;
                 expect(sql.toUpperCase().indexOf('DELETE')).to.be.above(-1);
               }
-            });
-          });
-        });
-      });
-    });
-
-    it('delete a record of multiple primary keys table', function() {
-      var MultiPrimary = this.sequelize.define('MultiPrimary', {
-        bilibili: {
-          type: Support.Sequelize.CHAR(2),
-          primaryKey: true
-        },
-
-        guruguru: {
-          type: Support.Sequelize.CHAR(2),
-          primaryKey: true
-        }
-      });
-
-      return MultiPrimary.sync({ force: true }).then(function() {
-        return MultiPrimary.create({ bilibili: 'bl', guruguru: 'gu' }).then(function() {
-          return MultiPrimary.create({ bilibili: 'bl', guruguru: 'ru' }).then(function(m2) {
-            return MultiPrimary.findAll().then(function(ms) {
-              expect(ms.length).to.equal(2);
-              return m2.destroy({
-                logging: function(sql) {
-                  expect(sql).to.exist;
-                  expect(sql.toUpperCase().indexOf('DELETE')).to.be.above(-1);
-                  expect(sql.indexOf('ru')).to.be.above(-1);
-                  expect(sql.indexOf('bl')).to.be.above(-1);
-                }
-              }).then(function() {
-                return MultiPrimary.findAll().then(function(ms) {
-                  expect(ms.length).to.equal(1);
-                  expect(ms[0].bilibili).to.equal('bl');
-                  expect(ms[0].guruguru).to.equal('gu');
-                });
-              });
             });
           });
         });
